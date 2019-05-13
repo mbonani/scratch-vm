@@ -198,6 +198,22 @@ class Thymio {
         this.node.emitEvents(action, args).then(callback);
         this.runtime.requestRedraw();
     }
+
+    sendActions (map, callback) {
+        for (const [action, args] of Object.entries(map)) {
+            log.info(`Send action ${action} with ${args}`);
+            map[action] = args.map(Math.round);
+            if (this.node === null) {
+                log.warn(`Tried to send action ${action} before having a connected node!`);
+            }
+        }
+        if (this.node === null) {
+            return;
+        }
+        this.node.emitEvents(map).then(callback);
+        this.runtime.requestRedraw();
+    }
+
     requestSend (args, _, callback) {
         // In previous version, the event name was used as an id.
         // With the new API it expects a Int16 as the id.
@@ -225,9 +241,7 @@ class Thymio {
         } else if (motor === 'right') {
             this.sendAction('M_motor_right', args);
         } else {
-            this.sendAction('M_motor_left', args, () => {
-                this.sendAction('M_motor_right', args);
-            });
+            this.sendActions({M_motor_left: args, M_motor_right: args});
         }
     }
     /**
@@ -236,18 +250,13 @@ class Thymio {
     stopMotors () {
         log.info('Stop all motors.');
         const args = [0];
-
-        this.sendAction('M_motor_left', args, () => {
-            this.sendAction('M_motor_right', args);
-        });
+        this.sendActions({M_motor_left: args, M_motor_right: args});
     }
     move (distance, callback) {
         const mm = parseInt(distance, 10);
         if (mm === 0) {
             const args = [100 * 32 / 10]; // speed=10mm/s
-            this.sendAction('M_motor_left', args, () => {
-                this.sendAction('M_motor_right', args, callback);
-            });
+            this.sendActions({M_motor_left: args, M_motor_right: args});
 
         } else {
             let speed;
@@ -289,9 +298,7 @@ class Thymio {
 
         if (mm === 0) {
             const args = [speed * 32 / 10]; // speed=10mm/s
-            this.sendAction('M_motor_left', args, () => {
-                this.sendAction('M_motor_right', args, callback);
-            });
+            this.sendActions({M_motor_left: args, M_motor_right: args});
         } else {
             const time = Math.abs(mm) * 100 / speed; // time measured in 100 Hz ticks
             speed = speed * 32 / 10;
@@ -384,13 +391,11 @@ class Thymio {
         speed = parseInt(clamp(speed, Thymio.VMIN * 10 / 32, Thymio.VMAX * 10 / 32), 10);
 
         if (angle === 0) {
-            const args = Array();
-            args.push(speed * 32 / 10); // speed=10mm/s
-
-            this.sendAction('M_motor_left', args, () => {
-                args[0] = -args[0];
-                this.sendAction('M_motor_right', args, callback);
-            });
+            const largs = Array();
+            largs.push(speed * 32 / 10); // speed=10mm/s
+            const rargs = Array();
+            largs.push(-largs[0]); // speed=10mm/s
+            this.sendActions({M_motor_left: largs, M_motor_right: rargs});
         } else {
             const time = Math.abs(angle) * 100 / speed; // time measured in 100 Hz ticks
             speed = speed * 32 / 10;
@@ -702,17 +707,14 @@ class Thymio {
         }
     }
     clearLeds () {
-        this.sendAction('V_leds_circle', [0, 0, 0, 0, 0, 0, 0, 0], () => {
-            this.sendAction('V_leds_top', [0, 0, 0], () => {
-                this.sendAction('V_leds_bottom', [0, 0, 0, 0], () => {
-                    this.sendAction('V_leds_bottom', [1, 0, 0, 0], () => {
-                        if (this.useHorizontalLeds) {
-                            this.sendAction('V_leds_prox_h', [0, 0, 0, 0, 0, 0, 0, 0]);
-                        }
-                    });
-                });
-            });
+        this.sendActions({
+            V_leds_circle: [0, 0, 0, 0, 0, 0, 0, 0],
+            V_leds_top: [0, 0, 0],
+            V_leds_bottom: [0, 0, 0, 0]
         });
+        if (this.useHorizontalLeds) {
+            this.sendAction('V_leds_prox_h', [0, 0, 0, 0, 0, 0, 0, 0]);
+        }
     }
     arc (radius, angle, callback) {
         angle = parseInt(angle, 10);

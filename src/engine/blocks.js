@@ -735,6 +735,12 @@ class Blocks {
                 if (this._blocks[e.newParent].inputs.hasOwnProperty(e.newInput)) {
                     oldShadow = this._blocks[e.newParent].inputs[e.newInput].shadow;
                 }
+
+                // If the block being attached is itself a shadow, make sure to set
+                // both block and shadow to that blocks ID. This happens when adding
+                // inputs to a custom procedure.
+                if (this._blocks[e.id].shadow) oldShadow = e.id;
+
                 this._blocks[e.newParent].inputs[e.newInput] = {
                     name: e.newInput,
                     block: e.id,
@@ -823,11 +829,12 @@ class Blocks {
      * @param {Array<object>} optBlocks Optional list of blocks to constrain the search to.
      * This is useful for getting variable/list references for a stack of blocks instead
      * of all blocks on the workspace
+     * @param {?boolean} optIncludeBroadcast Optional whether to include broadcast fields.
      * @return {object} A map of variable ID to a list of all variable references
      * for that ID. A variable reference contains the field referencing that variable
      * and also the type of the variable being referenced.
      */
-    getAllVariableAndListReferences (optBlocks) {
+    getAllVariableAndListReferences (optBlocks, optIncludeBroadcast) {
         const blocks = optBlocks ? optBlocks : this._blocks;
         const allReferences = Object.create(null);
         for (const blockId in blocks) {
@@ -839,6 +846,9 @@ class Blocks {
             } else if (blocks[blockId].fields.LIST) {
                 varOrListField = blocks[blockId].fields.LIST;
                 varType = Variable.LIST_TYPE;
+            } else if (optIncludeBroadcast && blocks[blockId].fields.BROADCAST_OPTION) {
+                varOrListField = blocks[blockId].fields.BROADCAST_OPTION;
+                varType = Variable.BROADCAST_MESSAGE_TYPE;
             }
             if (varOrListField) {
                 const currVarId = varOrListField.id;

@@ -358,6 +358,43 @@ test('move no obscure shadow', t => {
     t.end();
 });
 
+test('move - attaching new shadow', t => {
+    const b = new Blocks(new Runtime());
+    // Block/shadow are null to mimic state right after a procedure_call block
+    // is mutated by adding an input. The "move" will attach the new shadow.
+    b.createBlock({
+        id: 'foo',
+        opcode: 'TEST_BLOCK',
+        next: null,
+        fields: {},
+        inputs: {
+            fooInput: {
+                name: 'fooInput',
+                block: null,
+                shadow: null
+            }
+        },
+        topLevel: true
+    });
+    b.createBlock({
+        id: 'bar',
+        opcode: 'TEST_BLOCK',
+        shadow: true,
+        next: null,
+        fields: {},
+        inputs: {},
+        topLevel: true
+    });
+    b.moveBlock({
+        id: 'bar',
+        newInput: 'fooInput',
+        newParent: 'foo'
+    });
+    t.equal(b._blocks.foo.inputs.fooInput.block, 'bar');
+    t.equal(b._blocks.foo.inputs.fooInput.shadow, 'bar');
+    t.end();
+});
+
 test('change', t => {
     const b = new Blocks(new Runtime());
     b.createBlock({
@@ -806,6 +843,38 @@ test('getAllVariableAndListReferences returns references when variable blocks ex
     t.equal(varListRefs['mock list id'].length, 1);
     t.equal(varListRefs['mock list id'][0].type, Variable.LIST_TYPE);
     t.equal(varListRefs['mock list id'][0].referencingField.value, 'a mock list');
+
+    t.end();
+});
+
+test('getAllVariableAndListReferences does not return broadcast blocks if the flag is left out', t => {
+    const b = new Blocks(new Runtime());
+    b.createBlock(adapter(events.mockBroadcastBlock)[0]);
+    b.createBlock(adapter(events.mockBroadcastBlock)[1]);
+
+    t.equal(Object.keys(b.getAllVariableAndListReferences()).length, 0);
+    t.end();
+});
+
+test('getAllVariableAndListReferences returns broadcast when we tell it to', t => {
+    const b = new Blocks(new Runtime());
+
+    b.createBlock(adapter(events.mockVariableBlock)[0]);
+    // Make the broadcast block and its shadow (which includes the actual broadcast field).
+    b.createBlock(adapter(events.mockBroadcastBlock)[0]);
+    b.createBlock(adapter(events.mockBroadcastBlock)[1]);
+
+    const varListRefs = b.getAllVariableAndListReferences(null, true);
+
+    t.equal(Object.keys(varListRefs).length, 2);
+    t.equal(Array.isArray(varListRefs['mock var id']), true);
+    t.equal(varListRefs['mock var id'].length, 1);
+    t.equal(varListRefs['mock var id'][0].type, Variable.SCALAR_TYPE);
+    t.equal(varListRefs['mock var id'][0].referencingField.value, 'a mock variable');
+    t.equal(Array.isArray(varListRefs['mock broadcast message id']), true);
+    t.equal(varListRefs['mock broadcast message id'].length, 1);
+    t.equal(varListRefs['mock broadcast message id'][0].type, Variable.BROADCAST_MESSAGE_TYPE);
+    t.equal(varListRefs['mock broadcast message id'][0].referencingField.value, 'my message');
 
     t.end();
 });
