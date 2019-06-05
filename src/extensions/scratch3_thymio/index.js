@@ -118,6 +118,12 @@ class Thymio {
 
         this.tap = false;
         this.useHorizontalLeds = false;
+		
+		this.whenButtonCenter = false;
+		this.whenButtonForward = false;
+		this.whenButtonBackward = false;
+		this.whenButtonLeft = false;
+		this.whenButtonRight = false;
 
         client.onNodesChanged = nodes => {
             for (const node of nodes) {
@@ -140,6 +146,21 @@ class Thymio {
                             events.forEach((_, evt) => {
                                 if (evt === 'tap') {
                                     this.tap = true;
+                                }
+                                if (evt === 'B_center') {
+                                    this.whenButtonCenter = true;
+                                }
+                                if (evt === 'B_forward') {
+                                    this.whenButtonForward = true;
+                                }
+                                if (evt === 'B_backward') {
+                                    this.whenButtonBackward = true;
+                                }
+                                if (evt === 'B_left') {
+                                    this.whenButtonLeft = true;
+                                }
+                                if (evt === 'B_right') {
+                                    this.whenButtonRight = true;
                                 }
                             });
                             if (typeof this.eventCompleteCallback === 'function') {
@@ -893,7 +914,27 @@ class Thymio {
         return this.cachedValues.get('prox.comm.rx');
     }
     whenButton (button) {
-        return this.valButton(button);
+        if (button === 'center') {
+            const but = this.whenButtonCenter;
+            this.whenButtonCenter = false;
+            return but;
+        } else if (button === 'front') {
+            const but = this.whenButtonForward;
+            this.whenButtonForward = false;
+            return but;
+        } else if (button === 'back') {
+            const but = this.whenButtonBackward;
+            this.whenButtonBackward = false;
+            return but;
+        } else if (button === 'left') {
+            const but = this.whenButtonLeft;
+            this.whenButtonLeft = false;
+            return but;
+        } else if (button === 'right') {
+            const but = this.whenButtonRight;
+            this.whenButtonRight = false;
+            return but;
+        }
     }
     valButton (button) {
         if (button === 'center') {

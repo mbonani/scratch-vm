@@ -26,7 +26,12 @@ const eventsDefinition = [
     {name: 'M_motor_right', fixed_size: 1},
     {name: 'M_motors', fixed_size: 2},
     {name: 'Q_reset', fixed_size: 0},
-    {name: 'tap', fixed_size: 0}
+    {name: 'tap', fixed_size: 0},
+	{name: 'B_center', fixed_size: 0},
+	{name: 'B_forward', fixed_size: 0},
+	{name: 'B_backward', fixed_size: 0},
+	{name: 'B_left', fixed_size: 0},
+	{name: 'B_right', fixed_size: 0}
 ];
 
 const asebaScript = `
@@ -52,6 +57,31 @@ mic.threshold = 12
 
 onevent tap
   emit tap
+  
+onevent button.center
+  if button.center == 1 then 
+    emit B_center
+  end
+  
+onevent button.forward
+  if button.forward == 1 then 
+    emit B_forward
+  end
+  
+onevent button.backward
+  if button.backward == 1 then 
+    emit B_backward
+  end
+
+onevent button.left
+  if button.left == 1 then 
+    emit B_left
+  end  
+  
+onevent button.right
+  if button.right == 1 then 
+    emit B_right
+  end  
 
 onevent Q_set_odometer
   odo.theta = (((event.args[0] + 360) % 360) - 90) * 182
