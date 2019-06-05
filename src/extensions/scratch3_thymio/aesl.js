@@ -23,6 +23,7 @@ const eventsDefinition = [
     {name: 'A_sound_record', fixed_size: 1},
     {name: 'M_motor_left', fixed_size: 1},
     {name: 'M_motor_right', fixed_size: 1},
+	{name: 'M_motors', fixed_size: 2},
     {name: 'Q_reset', fixed_size: 0},
     {name: 'tap', fixed_size: 0}
 ];
@@ -123,8 +124,12 @@ onevent M_motor_left
 
 onevent M_motor_right
   motor.right.target = event.args[0]
+  
+onevent M_motors
+  motor.left.target = event.args[0]
+  motor.right.target = event.args[1]
 
-onevent buttons
+onevent prox
   call math.dot(distance.front, prox.horizontal,[13,26,39,26,13,0,0],11)
   call math.clamp(distance.front,190-distance.front,0,190)
   call math.max(distance.back, prox.horizontal[5],prox.horizontal[6])

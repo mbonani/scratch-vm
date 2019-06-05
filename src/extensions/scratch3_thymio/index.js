@@ -241,7 +241,8 @@ class Thymio {
         } else if (motor === 'right') {
             this.sendAction('M_motor_right', args);
         } else {
-            this.sendActions({M_motor_left: args, M_motor_right: args});
+			args.unshift(value);
+            this.sendAction('M_motors', args);
         }
     }
     /**
@@ -249,14 +250,14 @@ class Thymio {
      */
     stopMotors () {
         log.info('Stop all motors.');
-        const args = [0];
-        this.sendActions({M_motor_left: args, M_motor_right: args});
+        const args = [0,0];
+        this.sendAction('M_motors', args);
     }
     move (distance, callback) {
         const mm = parseInt(distance, 10);
         if (mm === 0) {
-            const args = [100 * 32 / 10]; // speed=10mm/s
-            this.sendActions({M_motor_left: args, M_motor_right: args});
+            const args = [100 * 32 / 10,100 * 32 / 10]; // speed=10mm/s
+            this.sendAction('M_motors', args);
 
         } else {
             let speed;
@@ -297,8 +298,8 @@ class Thymio {
         speed = parseInt(clamp(speed, Thymio.VMIN * 10 / 32, Thymio.VMAX * 10 / 32), 10);
 
         if (mm === 0) {
-            const args = [speed * 32 / 10]; // speed=10mm/s
-            this.sendActions({M_motor_left: args, M_motor_right: args});
+            const args = [speed * 32 / 10,speed * 32 / 10]; // speed=10mm/s
+            this.sendAction('M_motors', args);
         } else {
             const time = Math.abs(mm) * 100 / speed; // time measured in 100 Hz ticks
             speed = speed * 32 / 10;
@@ -390,12 +391,13 @@ class Thymio {
         speed = parseInt(Math.abs(speed), 10);
         speed = parseInt(clamp(speed, Thymio.VMIN * 10 / 32, Thymio.VMAX * 10 / 32), 10);
 
-        if (angle === 0) {
+        if (angle === 0) {//FIXME not working 
             const largs = Array();
             largs.push(speed * 32 / 10); // speed=10mm/s
             const rargs = Array();
             largs.push(-largs[0]); // speed=10mm/s
-            this.sendActions({M_motor_left: largs, M_motor_right: rargs});
+            const args = [largs,rargs];
+            this.sendAction('M_motors', args);
         } else {
             const time = Math.abs(angle) * 100 / speed; // time measured in 100 Hz ticks
             speed = speed * 32 / 10;
