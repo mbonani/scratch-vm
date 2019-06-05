@@ -38,8 +38,8 @@
     "decode-html": "2.0.0",
     "diff-match-patch": "1.0.4",
     "format-message": "6.2.1",
-    "htmlparser2": "3.10.0",
-    "immutable": "3.8.1",
+    "htmlparser2": "^3.10.0",
+    "immutable": "^3.8.1",
     "jszip": "^3.2.0",
     "minilog": "3.1.0",
     "nets": "3.2.0",
@@ -47,8 +47,8 @@
     "scratch-sb1-converter": "0.2.7",
     "scratch-translate-extension-languages": "0.0.20181205140428",
     "socket.io-client": "2.0.4",
-    "uuid": "^3.3.2",
     "text-encoding": "0.7.0",
+    "uuid": "^3.3.2",
     "worker-loader": "^1.1.1"
   },
   "devDependencies": {
