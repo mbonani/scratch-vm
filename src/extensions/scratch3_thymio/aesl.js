@@ -16,6 +16,7 @@ const eventsDefinition = [
     {name: 'V_leds_rc', fixed_size: 1},
     {name: 'V_leds_temperature', fixed_size: 2},
     {name: 'V_leds_sound', fixed_size: 1},
+    {name: 'V_leds_off', fixed_size: 1},
     {name: 'A_sound_freq', fixed_size: 2},
     {name: 'A_sound_play', fixed_size: 1},
     {name: 'A_sound_system', fixed_size: 1},
@@ -23,7 +24,7 @@ const eventsDefinition = [
     {name: 'A_sound_record', fixed_size: 1},
     {name: 'M_motor_left', fixed_size: 1},
     {name: 'M_motor_right', fixed_size: 1},
-	{name: 'M_motors', fixed_size: 2},
+    {name: 'M_motors', fixed_size: 2},
     {name: 'Q_reset', fixed_size: 0},
     {name: 'tap', fixed_size: 0}
 ];
@@ -103,6 +104,16 @@ onevent V_leds_temperature
 
 onevent V_leds_top
   call leds.top(event.args[0],event.args[1],event.args[2])
+  
+onevent V_leds_off
+  call leds.top(0,0,0)
+  call leds.bottom.left(0,0,0)
+  call leds.bottom.right(0,0,0)
+  call leds.circle(0,0,0,0,0,0,0,0)
+  if event.args[0]==1 then 
+    call leds.prox.h(0,0,0,0,0,0,0,0)
+    call leds.prox.v(0,0)
+  end
 
 onevent A_sound_system
   call sound.system(event.args[0])

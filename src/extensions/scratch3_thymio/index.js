@@ -709,13 +709,12 @@ class Thymio {
         }
     }
     clearLeds () {
-        this.sendActions({
-            V_leds_circle: [0, 0, 0, 0, 0, 0, 0, 0],
-            V_leds_top: [0, 0, 0],
-            V_leds_bottom: [0, 0, 0, 0]
-        });
         if (this.useHorizontalLeds) {
-            this.sendAction('V_leds_prox_h', [0, 0, 0, 0, 0, 0, 0, 0]);
+            const args =[1];
+            this.sendAction('V_leds_off',args);
+        }else{
+            const args =[0];
+            this.sendAction('V_leds_off',args);
         }
     }
     arc (radius, angle, callback) {
@@ -856,6 +855,7 @@ class Thymio {
         this.sendAction('V_leds_prox_h', args);
     }
     ledsProxV (left, right) {
+        this.useHorizontalLeds = true;
         const args = [
             parseInt(clamp(left, Thymio.LMIN, Thymio.LMAX), 10),
             parseInt(clamp(right, Thymio.LMIN, Thymio.LMAX), 10)
