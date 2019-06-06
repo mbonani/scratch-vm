@@ -27,11 +27,11 @@ const eventsDefinition = [
     {name: 'M_motors', fixed_size: 2},
     {name: 'Q_reset', fixed_size: 0},
     {name: 'tap', fixed_size: 0},
-	{name: 'B_center', fixed_size: 0},
-	{name: 'B_forward', fixed_size: 0},
-	{name: 'B_backward', fixed_size: 0},
-	{name: 'B_left', fixed_size: 0},
-	{name: 'B_right', fixed_size: 0}
+    {name: 'B_center', fixed_size: 0},
+    {name: 'B_forward', fixed_size: 0},
+    {name: 'B_backward', fixed_size: 0},
+    {name: 'B_left', fixed_size: 0},
+    {name: 'B_right', fixed_size: 0}
 ];
 
 const asebaScript = `
