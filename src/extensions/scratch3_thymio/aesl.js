@@ -102,7 +102,10 @@ onevent Q_reset
 onevent V_leds_bottom
   if event.args[0]==0 then
     call leds.bottom.left(event.args[1],event.args[2],event.args[3])
+  elseif event.args[0]==1 then
+    call leds.bottom.right(event.args[1],event.args[2],event.args[3])
   else
+    call leds.bottom.left(event.args[1],event.args[2],event.args[3])
     call leds.bottom.right(event.args[1],event.args[2],event.args[3])
   end
 
