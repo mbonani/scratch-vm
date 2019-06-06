@@ -118,12 +118,12 @@ class Thymio {
 
         this.tap = false;
         this.useHorizontalLeds = false;
-		
-		this.whenButtonCenter = false;
-		this.whenButtonForward = false;
-		this.whenButtonBackward = false;
-		this.whenButtonLeft = false;
-		this.whenButtonRight = false;
+
+        this.whenButtonCenter = false;
+        this.whenButtonForward = false;
+        this.whenButtonBackward = false;
+        this.whenButtonLeft = false;
+        this.whenButtonRight = false;
 
         client.onNodesChanged = nodes => {
             for (const node of nodes) {
@@ -262,7 +262,7 @@ class Thymio {
         } else if (motor === 'right') {
             this.sendAction('M_motor_right', args);
         } else {
-			args.unshift(value);
+            args.unshift(value);
             this.sendAction('M_motors', args);
         }
     }
