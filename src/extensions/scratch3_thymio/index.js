@@ -592,9 +592,7 @@ class Thymio {
         ];
 
         if (led === 'all') {
-            this.sendAction('V_leds_top', args);
-            args.unshift(2);
-            this.sendAction('V_leds_bottom', args);
+            this.sendAction('V_leds_top_and_bottom', args);
         } else if (led === 'top') {
             this.sendAction('V_leds_top', args);
         } else if (led === 'bottom') {
@@ -645,14 +643,13 @@ class Thymio {
             rgb.unshift(2);
             this.sendAction('V_leds_bottom', rgb, () => {
                 this._leds[1] = color;
+				this._leds[2] = color;
             });
         } else {
-            this.sendAction('V_leds_top', rgb, () => {
+            this.sendAction('V_leds_top_and_bottom', rgb, () => {
                 this._leds[0] = color;
-                rgb.unshift(2);
-                this.sendAction('V_leds_bottom', rgb, () => {
-                    this._leds[1] = color;
-                });
+				this._leds[1] = color;
+				this._leds[2] = color;
             });
         }
     }
