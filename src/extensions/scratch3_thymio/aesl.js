@@ -225,7 +225,7 @@ onevent motor
   odo.y += tmp[1]/45
   odo.degree = 90 - (odo.theta / 182)
   if Qtime[Qpc] > 0 then
-    emit Q_motion_started([Qid[Qpc], Qtime[Qpc], QspL[Qpc], QspR[Qpc], Qpc])
+    #emit Q_motion_started([Qid[Qpc], Qtime[Qpc], QspL[Qpc], QspR[Qpc], Qpc])
     Qtime[Qpc] = 0 - Qtime[Qpc]
   end
   if Qtime[Qpc] < 0 then
@@ -233,7 +233,7 @@ onevent motor
     motor.right.target = QspR[Qpc]
     Qtime[Qpc] += 1
     if Qtime[Qpc] == 0 then
-      emit Q_motion_ended([Qid[Qpc], Qtime[Qpc], QspL[Qpc], QspR[Qpc], Qpc])
+      #emit Q_motion_ended([Qid[Qpc], Qtime[Qpc], QspL[Qpc], QspR[Qpc], Qpc])
       Qid[Qpc] = 0
       Qpc = (Qpc+1)%4
 
