@@ -10,6 +10,7 @@ const eventsDefinition = [
     {name: 'V_leds_prox_h', fixed_size: 8},
     {name: 'V_leds_circle', fixed_size: 8},
     {name: 'V_leds_top', fixed_size: 3},
+	{name: 'V_leds_top_and_bottom', fixed_size: 3},
     {name: 'V_leds_bottom', fixed_size: 4},
     {name: 'V_leds_prox_v', fixed_size: 2},
     {name: 'V_leds_buttons', fixed_size: 4},
@@ -137,6 +138,11 @@ onevent V_leds_temperature
 
 onevent V_leds_top
   call leds.top(event.args[0],event.args[1],event.args[2])
+  
+onevent V_leds_top_and_bottom
+  call leds.top(event.args[0],event.args[1],event.args[2])
+  call leds.bottom.left(event.args[0],event.args[1],event.args[2])
+  call leds.bottom.right(event.args[0],event.args[1],event.args[2])  
   
 onevent V_leds_off
   call leds.top(0,0,0)
