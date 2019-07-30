@@ -503,10 +503,13 @@ class Thymio {
      * @returns {number} Distance from an obstacle calculated from the given sensors
      */
     distance (sensor) {
+		 
         if (sensor === 'front') {
-            return this.cachedValues.get('distance.front');
+            const s = this.cachedValues.get('distance.front');
+			return s*1;/* fix to display variable*/
         } else if (sensor === 'back') {
-            return this.cachedValues.get('distance.back');
+            const s = this.cachedValues.get('distance.back');
+			return s*1;/* fix to display variable*/
         }
         let ground = this.cachedValues.get('prox.ground.delta').reduce((a, b) => a + b, 0);
 
@@ -519,7 +522,8 @@ class Thymio {
      * calculated from the horizontal sensors of an obstacle.
      */
     angle (sensor) {
-        return this.cachedValues.get(`angle.${sensor}`);
+		const s = this.cachedValues.get(`angle.${sensor}`);
+		return s*1;/* fix to display variable*/
     }
     touchVal (sensor) {
         if (sensor === 'front') {
@@ -779,7 +783,7 @@ class Thymio {
         return this.cachedValues.get('prox.horizontal').join(' ');
     }
     micIntensity () {
-        return this.cachedValues.get('mic.intensity');
+        return this.cachedValues.get('mic.intensity')*1;
     }
     soundDetected () {
         const intensity = this.micIntensity();
@@ -807,7 +811,7 @@ class Thymio {
     }
     odometer (odo) {
         if (odo === 'direction') {
-            return this.cachedValues.get('odo.degree');
+            return this.cachedValues.get('odo.degree')/1;
         } else if (odo === 'x') {
             return this.cachedValues.get('odo.x') / 28;
         } else if (odo === 'y') {
@@ -1918,7 +1922,7 @@ class Scratch3ThymioBlocks {
         return `${left} ${right}`;
     }
     micIntensity () {
-        return this.thymio.micIntensity();
+        return this.thymio.micIntensity()*1;
     }
     soundDetected () {
         return this.thymio.soundDetected();
