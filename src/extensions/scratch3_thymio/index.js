@@ -238,12 +238,12 @@ class Thymio {
     requestSend (args, _, callback) {
         // In previous version, the event name was used as an id.
         // With the new API it expects a Int16 as the id.
-        // We use a static table as actually only a single event is used in this case.
-        const action2Id = {
+        /*const action2Id = {
             Q_add_motion: 42
-        };
-        const actionId = action2Id[args[0]];
+        };*/
+        const actionId = Math.floor((Math.random() * 10000) + 1);//add random value to discar same command
         this.sendAction(args[0], [actionId].concat(args.slice(1)), callback);
+		this.sendAction(args[0], [actionId].concat(args.slice(1)), callback);//send twice to ensure command is passed
     }
     /**
      * Run the left/right/all motors.
