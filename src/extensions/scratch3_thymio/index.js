@@ -234,16 +234,35 @@ class Thymio {
         this.node.emitEvents(map).then(callback);
         this.runtime.requestRedraw();
     }
-
-    requestSend (args, _, callback) {
-        // In previous version, the event name was used as an id.
-        // With the new API it expects a Int16 as the id.
-        /*const action2Id = {
-            Q_add_motion: 42
-        };*/
-        const actionId = Math.floor((Math.random() * 10000) + 1);//add random value to discar same command
-        this.sendAction(args[0], [actionId].concat(args.slice(1)), callback);
-		this.sendAction(args[0], [actionId].concat(args.slice(1)), callback);//send twice to ensure command is passed
+	
+	requestSendQmotion (args, _, callback) {
+        //  Handshake Qmotion with timeout behavior
+		const actionId = Math.floor((Math.random() * 10000) + 1);//add random value to discar same command
+		this.sendAction(args[0], [actionId].concat(args.slice(1)), () => {
+			// Set message to look for in event "message" and execute callback (next block) when received
+			var addMotion = setInterval(()=>{log.info(`Timeout resend`);this.sendAction(args[0], [actionId].concat(args.slice(1)));},100);
+			this.eventCompleteCallback = (data, event) => {
+				if (event.match(/^Q_motion_added/)) {
+					log.info(`Q_motion_added ${addMotion}`);
+					clearInterval(addMotion);
+					var endMotion=setTimeout(callback,(args[1]*10)+100);						
+					this.eventCompleteCallback = (data, event) => {
+						if (event.match(/^Q_motion_noneleft/)){
+							log.info(`Q_noneleft ${endMotion}`);
+							clearTimeout(endMotion);
+							callback();
+						}
+					};
+				}
+				else{
+					if (event.match(/^Q_motion_noneleft/)){
+						log.info(`Q_noneleft without add`);
+						clearInterval(addMotion);
+						callback();							
+					}					
+				}
+			};
+		});
     }
     /**
      * Run the left/right/all motors.
@@ -302,14 +321,8 @@ class Thymio {
                 args.push(speed * -1);
                 args.push(speed * -1);
             }
-            this.requestSend(args, 2, () => {
-                // Set message to look for in event "message" and execute callback (next block) when received
-                this.eventCompleteCallback = (data, event) => {
-                    if (event.match(/^Q_motion_noneleft/)) {
-                        callback();
-                    }
-                };
-            });
+			// Send request
+            this.requestSendQmotion(args, 2, callback);			
         }
     }
     moveWithSpeed (distance, speed, callback) {
@@ -336,14 +349,7 @@ class Thymio {
                 args.push(speed * -1);
             }
             // Send request
-            this.requestSend(args, 2, () => {
-                // Set message to look for in event "message" and execute callback (next block) when received
-                this.eventCompleteCallback = (data, event) => {
-                    if (event.match(/^Q_motion_noneleft/)) {
-                        callback();
-                    }
-                };
-            });
+            this.requestSendQmotion(args, 2, callback);
         }
     }
     moveWithTime (distance, time, callback) {
@@ -366,16 +372,8 @@ class Thymio {
             args.push(speed * -1);
             args.push(speed * -1);
         }
-
-        // Send request
-        this.requestSend(args, 2, () => {
-            // Set message to look for in event "message" and execute callback (next block) when received
-            this.eventCompleteCallback = (data, event) => {
-                if (event.match(/^Q_motion_noneleft/)) {
-                    callback();
-                }
-            };
-        });
+		// Send request
+        this.requestSendQmotion(args, 2, callback);
     }
     turn (angle, callback) {
         angle = parseInt(angle, 10);
@@ -396,16 +394,8 @@ class Thymio {
         args.push((angle > 0) ? speed : speed * -1);
         args.push((angle > 0) ? speed * -1 : speed);
 
-
-        // Send request
-        this.requestSend(args, 2, () => {
-            // Set message to look for in event "message" and execute callback (next block) when received
-            this.eventCompleteCallback = (data, event) => {
-                if (event.match(/^Q_motion_noneleft/)) {
-                    callback();
-                }
-            };
-        });
+       // Send request
+       this.requestSendQmotion(args, 2, callback);
     }
     turnWithSpeed (angle, speed, callback) {
         angle = parseInt(angle, 10) * 0.78;
@@ -435,14 +425,8 @@ class Thymio {
                 args.push(speed);
             }
 
-            this.requestSend(args, 2, () => {
-                // Set message to look for in event "message" and execute callback (next block) when received
-                this.eventCompleteCallback = (data, event) => {
-                    if (event.match(/^Q_motion_noneleft/)) {
-                        callback();
-                    }
-                };
-            });
+            // Send request
+            this.requestSendQmotion(args, 2, callback);
         }
     }
     turnWithTime (angle, time, callback) {
@@ -464,14 +448,8 @@ class Thymio {
             args.push(speed);
         }
 
-        this.requestSend(args, 2, () => {
-            // Set message to look for in event "message" and execute callback (next block) when received
-            this.eventCompleteCallback = (data, event) => {
-                if (event.match(/^Q_motion_noneleft/)) {
-                    callback();
-                }
-            };
-        });
+		// Send request
+        this.requestSendQmotion(args, 2, callback);
     }
     /**
      * Returns the value returned by a given position sensor.
@@ -752,14 +730,8 @@ class Thymio {
         args.push((angle > 0) ? vOut : vIn);
         args.push((angle > 0) ? vIn : vOut);
 
-        this.requestSend(args, 2, () => {
-            // Set message to look for in event "message" and execute callback (next block) when received
-            this.eventCompleteCallback = (data, event) => {
-                if (event.match(/^Q_motion_noneleft/)) {
-                    callback();
-                }
-            };
-        });
+       // Send request
+       this.requestSendQmotion(args, 2, callback);
     }
     soundSystem (sound) {
         this.sendAction('A_sound_system', [parseInt(sound, 10)]);
